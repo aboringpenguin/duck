@@ -1,0 +1,139 @@
+<html>
+<head>
+  <title>Duck</title>
+  <link rel="icon" type="image/x-icon" href="duck.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@200;400&display=swap" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Titillium+Web:wght@200;400&display=swap');
+    /* set up some basic styles for the game */
+    body {
+      background-color: lightblue;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+      font-family: 'Titillium Web', sans-serif;
+    }
+
+    .duck {
+      /* set up the duck as a small square image */
+      width: 50px;
+      height: 50px;
+      background-image: url('duck.png');
+      background-size: cover;
+      position: absolute;
+      transform: scaleX(1);
+    }
+
+    #counter {
+      position: absolute;
+      top: 0;
+      left: 0;
+      padding: 5px;
+      font-size: 20px;
+      color: black;
+    }
+  </style>
+</head>
+<body>
+  <div id="counter"><strong>Duck</strong> has moved <div class="counter">0</div> meters</div>
+  <!-- create a div to represent the duck -->
+  <div class="duck"></div>
+
+  <!-- set up some JavaScript to handle user input and move the duck -->
+  <script>
+    // get a reference to the duck element
+    const duck = document.querySelector('.duck');
+    const counter = document.querySelector('.counter');
+    let count = 0;
+
+    // set up some initial positioning for the duck
+    duck.style.left = `${window.innerWidth / 2 - 25}px`;
+    duck.style.top = `${window.innerHeight / 2 - 25}px`;
+
+    // set up a timer to track how long the arrow key has been inactive
+    let timer = null;
+
+    // listen for arrow key events
+    document.addEventListener('keydown', event => {
+        // clear the timer if it is set
+        if (timer) clearTimeout(timer);
+
+        // get the current position of the duck
+        let left = parseInt(duck.style.left);
+        let top = parseInt(duck.style.top);
+
+        // determine the new position of the duck based on the arrow key pressed
+        switch (event.key) {
+            case 'ArrowUp':
+                top -= 5;
+                break;
+            case 'ArrowDown':
+                top += 5;
+                break;
+            case 'ArrowLeft':
+                left -= 5;
+                duck.style.transform = 'scaleX(-1)';
+                break;
+            case 'ArrowRight':
+                left += 5;
+                duck.style.transform = 'scaleX(1)';
+                break;
+        }
+
+        // wrap the duck around to the opposite side of the screen if it goes off the edge
+        if (left < 0) left = window.innerWidth - 50;
+        if (left > window.innerWidth - 50) left = 0;
+        if (top < 0) top = window.innerHeight - 50;
+        if (top > window.innerHeight - 50) top = 0;
+
+        // update the position of the duck
+        duck.style.left = `${left}px`;
+        duck.style.top = `${top}px`;
+        
+        count += 1;
+        counter.textContent = count;
+        
+        // set a timer to move the duck randomly if no arrow keys are pressed
+        timer = setInterval(() => {
+            // determine the new position of the duck based on a random direction
+            let left = parseInt(duck.style.left);
+            let top = parseInt(duck.style.top);
+            let direction = Math.floor(Math.random() * 4);
+            switch (direction) {
+                case 0:
+                    top -= 5;
+                    break;
+                case 1:
+                    top += 5;
+                    break;
+                case 2:
+                    left -= 5;
+                    duck.style.transform = 'scaleX(-1)';
+                    break;
+                case 3:
+                    left += 5;
+                    duck.style.transform = 'scaleX(1)';
+                    break;
+            }
+
+            // wrap the duck around to the opposite side of the screen if it goes off the edge
+            if (left < 0) left = window.innerWidth - 50;
+            if (left > window.innerWidth - 50) left = 0;
+            if (top < 0) top = window.innerHeight - 50;
+            if (top > window.innerHeight - 50) top = 0;
+
+            // update the position of the duck
+            duck.style.left = `${left}px`;
+            duck.style.top = `${top}px`;
+
+            count += 1;
+            counter.textContent = count;
+        }, 1000);
+    });
+  </script>
+</body>
+</html>
