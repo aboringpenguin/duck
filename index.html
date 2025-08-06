@@ -36,10 +36,32 @@
       font-size: 20px;
       color: black;
     }
+
+    #mini-map {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      border: 2px solid black;
+    }
+
+    .map-row {
+      display: flex;
+    }
+
+    .map-cell {
+      width: 20px;
+      height: 20px;
+      border: 1px solid black;
+    }
+
+    .current-zone {
+      box-shadow: 0 0 0 3px red inset;
+    }
   </style>
 </head>
 <body>
   <div id="counter"><strong>Duck</strong> has moved <div class="counter">0</div> meters</div>
+  <div id="mini-map"></div>
   <!-- create a div to represent the duck -->
   <div class="duck"></div>
 
@@ -49,6 +71,43 @@
     const duck = document.querySelector('.duck');
     const counter = document.querySelector('.counter');
     let count = 0;
+
+    // set up the world map
+    const world = [
+        ['lightblue', 'lightgreen', 'lightyellow'],
+        ['lightcoral', 'lightsalmon', 'lightseagreen'],
+        ['lightpink', 'lightskyblue', 'lightgoldenrodyellow']
+    ];
+    const worldWidth = world[0].length;
+    const worldHeight = world.length;
+    let currentZoneX = 1;
+    let currentZoneY = 1;
+
+    // function to update the zone
+    function updateZone() {
+        document.body.style.backgroundColor = world[currentZoneY][currentZoneX];
+        updateMiniMap();
+    }
+
+    // function to update the mini-map
+    function updateMiniMap() {
+        const miniMap = document.getElementById('mini-map');
+        miniMap.innerHTML = '';
+        for (let y = 0; y < worldHeight; y++) {
+            const row = document.createElement('div');
+            row.className = 'map-row';
+            for (let x = 0; x < worldWidth; x++) {
+                const cell = document.createElement('div');
+                cell.className = 'map-cell';
+                cell.style.backgroundColor = world[y][x];
+                if (x === currentZoneX && y === currentZoneY) {
+                    cell.classList.add('current-zone');
+                }
+                row.appendChild(cell);
+            }
+            miniMap.appendChild(row);
+        }
+    }
 
     // set up some initial positioning for the duck
     duck.style.left = `${window.innerWidth / 2 - 25}px`;
@@ -84,11 +143,27 @@
                 break;
         }
 
-        // wrap the duck around to the opposite side of the screen if it goes off the edge
-        if (left < 0) left = window.innerWidth - 50;
-        if (left > window.innerWidth - 50) left = 0;
-        if (top < 0) top = window.innerHeight - 50;
-        if (top > window.innerHeight - 50) top = 0;
+        // check for zone transitions
+        if (left < 0) {
+            currentZoneX = (currentZoneX - 1 + worldWidth) % worldWidth;
+            left = window.innerWidth - 50;
+            updateZone();
+        }
+        if (left > window.innerWidth - 50) {
+            currentZoneX = (currentZoneX + 1) % worldWidth;
+            left = 0;
+            updateZone();
+        }
+        if (top < 0) {
+            currentZoneY = (currentZoneY - 1 + worldHeight) % worldHeight;
+            top = window.innerHeight - 50;
+            updateZone();
+        }
+        if (top > window.innerHeight - 50) {
+            currentZoneY = (currentZoneY + 1) % worldHeight;
+            top = 0;
+            updateZone();
+        }
 
         // update the position of the duck
         duck.style.left = `${left}px`;
@@ -134,6 +209,9 @@
             counter.textContent = count;
         }, 1000);
     });
+
+    // set the initial zone
+    updateZone();
   </script>
 </body>
 </html>
