@@ -57,11 +57,25 @@
     .current-zone {
       box-shadow: 0 0 0 3px red inset;
     }
+
+    #achievement-message {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: white;
+      padding: 20px;
+      border: 2px solid black;
+      font-size: 24px;
+      text-align: center;
+      display: none;
+    }
   </style>
 </head>
 <body>
   <div id="counter"><strong>Duck</strong> has moved <div class="counter">0</div> meters</div>
   <div id="mini-map"></div>
+  <div id="achievement-message"></div>
   <!-- create a div to represent the duck -->
   <div class="duck"></div>
 
@@ -71,6 +85,15 @@
     const duck = document.querySelector('.duck');
     const counter = document.querySelector('.counter');
     let count = 0;
+
+    // set up achievements
+    const achievements = [
+        { steps: 10, compliment: "You're doing great!" },
+        { steps: 25, compliment: "You're a natural!" },
+        { steps: 50, compliment: "You're a pro!" },
+        { steps: 100, compliment: "You're a legend!" }
+    ];
+    let unlockedAchievements = [];
 
     // set up the world map
     const world = [
@@ -107,6 +130,16 @@
             }
             miniMap.appendChild(row);
         }
+    }
+
+    function displayAchievement(achievement) {
+        const achievementMessage = document.getElementById('achievement-message');
+        achievementMessage.textContent = achievement.compliment;
+        achievementMessage.style.display = 'block';
+
+        setTimeout(() => {
+            achievementMessage.style.display = 'none';
+        }, 3000);
     }
 
     // set up some initial positioning for the duck
@@ -172,6 +205,14 @@
         count += 1;
         counter.textContent = count;
         
+        // check for achievements
+        for (const achievement of achievements) {
+            if (count === achievement.steps && !unlockedAchievements.includes(achievement)) {
+                unlockedAchievements.push(achievement);
+                displayAchievement(achievement);
+            }
+        }
+
         // set a timer to move the duck randomly if no arrow keys are pressed
         timer = setInterval(() => {
             // determine the new position of the duck based on a random direction
